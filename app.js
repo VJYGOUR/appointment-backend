@@ -12,7 +12,7 @@ connectDB();
 const corsOptions = {
   origin:
     process.env.NODE_ENV === "production"
-      ? ["https://your-production-domain.com"] // Production: Whitelist your frontend URL
+      ? ["https://appointment-frontend-dpiw.onrender.com"] // Production: Whitelist your frontend URL
       : ["http://localhost:5173", "http://127.0.0.1:5173"], // Development: Allow localhost
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // Allow cookies/auth headers
