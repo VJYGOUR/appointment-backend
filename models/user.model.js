@@ -19,6 +19,8 @@ const userSchema = mongoose.Schema(
         message: "Please provide a valid email",
       },
     },
+    name: { type: String },
+    age: { type: Number },
     mobileNumber: {
       type: String,
       unique: true,
