@@ -1,0 +1,32 @@
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import appointmentRoute from "./routes/appointment.route.js";
+import slotsRoute from "./routes/slots.route.js";
+import authRoute from "./routes/auth.route.js";
+import connectDB from "./utils/db.js";
+const app = express();
+const PORT = 5000;
+dotenv.config();
+connectDB();
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === "production"
+      ? ["https://your-production-domain.com"] // Production: Whitelist your frontend URL
+      : ["http://localhost:5173", "http://127.0.0.1:5173"], // Development: Allow localhost
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Allow cookies/auth headers
+  optionsSuccessStatus: 204,
+};
+app.use(express.json());
+app.use(cors(corsOptions));
+app.use("/api/auth", authRoute);
+app.use("/api/appointement", appointmentRoute);
+app.use("/api/slots", slotsRoute);
+// ROUTE
+app.get("/", (req, res) => {
+  res.json("server is running");
+});
+app.listen(PORT, () => {
+  console.log(`server is listening on ${PORT}`);
+});
