@@ -9,6 +9,7 @@ import profileRoute from "./routes/profile.route.js";
 import connectDB from "./utils/db.js";
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = 5000;
 dotenv.config();
 connectDB();
