@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import appointmentRoute from "./routes/appointment.route.js";
 import slotsRoute from "./routes/slots.route.js";
 import authRoute from "./routes/auth.route.js";
+import profileRoute from "./routes/profile.route.js";
 import connectDB from "./utils/db.js";
 
 const app = express();
@@ -21,6 +23,7 @@ const corsOptions = {
 };
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(cookieParser());
 console.log("Loading authRoute...");
 app.use("/api/auth", authRoute);
 
@@ -29,6 +32,7 @@ app.use("/api/appointment", appointmentRoute);
 
 console.log("Loading slotsRoute...");
 app.use("/api/slots", slotsRoute);
+app.use("/api/profile", profileRoute);
 
 // ROUTE
 app.get("/", (req, res) => {
