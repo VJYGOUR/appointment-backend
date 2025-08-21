@@ -101,18 +101,19 @@ export const login = async (req, res) => {
     const token = generateToken(userRegistered._id);
 
     // set cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // only https in prod
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      ...(process.env.NODE_ENV === "production" && { domain: ".onrender.com" }),
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production", // only https in prod
+    //   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    //   ...(process.env.NODE_ENV === "production" && { domain: ".onrender.com" }),
 
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    // });
     // Successful login
     res.status(200).json({
       message: "Login successful",
       success: true,
+      token,
       user: {
         id: userRegistered._id,
         name: userRegistered.name,
@@ -125,11 +126,11 @@ export const login = async (req, res) => {
   }
 };
 export const logout = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    ...(process.env.NODE_ENV === "production" && { domain: ".onrender.com" }),
-  });
+  // res.clearCookie("token", {
+  //   httpOnly: true,
+  //   secure: process.env.NODE_ENV === "production",
+  //   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  //   ...(process.env.NODE_ENV === "production" && { domain: ".onrender.com" }),
+  // });
   res.status(200).json({ message: "Logged out successfully" });
 };
