@@ -129,6 +129,7 @@ export const logout = (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    ...(process.env.NODE_ENV === "production" && { domain: ".onrender.com" }),
   });
   res.status(200).json({ message: "Logged out successfully" });
 };
