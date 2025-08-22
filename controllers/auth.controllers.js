@@ -134,3 +134,41 @@ export const logout = (req, res) => {
   // });
   res.status(200).json({ message: "Logged out successfully" });
 };
+//resend verification mail
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // check if email provided
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // check if already verified
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Email already verified" });
+    }
+
+    // generate new token
+    const emailVerificationToken = jwt.sign({ email }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    // send email
+    await sendVerificationEmail(email, emailVerificationToken);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Verification email resent. Please check your inbox.",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
