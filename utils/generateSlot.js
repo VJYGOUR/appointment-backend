@@ -7,11 +7,11 @@ export function generateSlots(
   const slots = [];
   const current = new Date(date);
   current.setHours(startHour, 0, 0, 0);
-  const end = newDate(date);
+  const end = new Date(date);
   end.setHours(endHour, 0, 0, 0);
   while (current < end) {
     //push time to array
-    slots.push(newDate(current));
+    slots.push(new Date(current));
     current.setMinutes(current.getMinutes() + intervalMinutes);
   }
   return slots;

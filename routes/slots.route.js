@@ -1,6 +1,5 @@
 import express from "express";
+import getSlots from "../controllers/slots.controllers.js";
 const router = express.Router();
-router.get("/", (req, res) => {
-  res.json("slot route is working");
-});
+router.get("/getSlots", getSlots);
 export default router;
