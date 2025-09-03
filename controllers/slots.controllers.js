@@ -1,42 +1,43 @@
 import appointmentModel from "../models/appointment.model.js";
 import { generateSlots } from "../utils/generateSlot.js";
 import { DateTime } from "luxon";
+
 const getSlots = async (req, res) => {
   try {
     const { date } = req.params;
-    console.log(date); // ✅ no need for .params if you send in body
-    if (!date) return res.status(400).json({ error: "Date is required" });
+    if (!date) {
+      return res.status(400).json({ error: "Date is required" });
+    }
+
+    // Convert the incoming UTC date string to a Luxon DateTime object in the Asia/Kolkata timezone
     const dateInIst = DateTime.fromISO(date, { zone: "utc" }).setZone(
       "Asia/Kolkata"
     );
-    // Extract the date string in YYYY-MM-DD format for THAT timezone
-    const localDateString = dateInIst.toISODate(); // "2025-08-12"
-    // Step 1: Generate all possible slots
+
+    // Step 1: Generate all possible slots for the correct day in IST
     const allSlots = generateSlots(dateInIst.toJSDate());
 
-    // Step 2: Get booked appointments for that day
-    const startTime = new Date(localDateString);
-    startTime.setHours(0, 0, 0, 0);
+    // Step 2: Correctly define the query range in IST for the database
+    const startTime = dateInIst.startOf("day").toJSDate();
+    const endTime = dateInIst.endOf("day").toJSDate();
 
-    const endTime = new Date(localDateString);
-    endTime.setHours(23, 59, 59, 999);
-
+    // Fetch booked appointments for the correct day in IST
     const bookedAppointments = await appointmentModel.find({
       datetime: { $gte: startTime, $lte: endTime },
     });
 
-    // Step 3: Extract booked times (normalized)
+    // Step 3: Extract booked times in ISO format for comparison
     const bookedTimes = bookedAppointments.map((appt) =>
       new Date(appt.datetime).toISOString()
     );
 
-    // Step 4: Remove booked slots from all slots
+    // Step 4: Filter out booked slots
     const availableSlots = allSlots.filter(
       (slot) => !bookedTimes.includes(new Date(slot).toISOString())
     );
 
-    // Step 5: Send response
-    res.json({ localDateString, availableSlots });
+    // Step 5: Send response with available slots
+    res.json({ availableSlots });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
