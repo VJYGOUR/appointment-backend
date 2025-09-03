@@ -1,6 +1,8 @@
 /**
  * Generates time slots for a specific date within a given time range and interval.
- * @param {Date} date The date object to generate slots for, in the correct timezone.
+ * All calculations are done in UTC to ensure consistency across all servers.
+ * The IST offset is applied to generate the correct slots.
+ * @param {Date} date The date object representing the day to generate slots for.
  * @param {number} startHour The starting hour (24-hour format) in IST.
  * @param {number} endHour The ending hour (24-hour format) in IST.
  * @param {number} intervalMinutes The interval between slots in minutes.
@@ -13,26 +15,31 @@ export function generateSlots(
   intervalMinutes = 30
 ) {
   const slots = [];
-  const IST_OFFSET_MINUTES = 330; // 5.5 hours * 60 minutes/hour
+  const IST_OFFSET = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
 
-  // 1. Create a new Date object representing the start of the day in UTC
-  const current = new Date(date);
-  current.setUTCHours(0, 0, 0, 0);
+  // Get the start of the day in UTC from the input date.
+  const startOfDayUTC = new Date(date);
+  startOfDayUTC.setUTCHours(0, 0, 0, 0);
 
-  // 2. Adjust for the IST timezone offset to get the start of the IST day
-  current.setMinutes(current.getMinutes() + IST_OFFSET_MINUTES);
+  // Calculate the start time for slots in UTC by adjusting for the IST offset.
+  // Example: 9 AM IST is 3:30 AM UTC on the same day.
+  const startSlotTime = new Date(
+    startOfDayUTC.getTime() - IST_OFFSET + startHour * 60 * 60 * 1000
+  );
 
-  // 3. Set the start hour and end hour for the slots based on the desired IST time
-  const startSlotTime = new Date(current);
-  startSlotTime.setHours(startHour, 0, 0, 0);
+  // Calculate the end time for slots in UTC by adjusting for the IST offset.
+  // Example: 5 PM IST is 11:30 AM UTC on the same day.
+  const endSlotTime = new Date(
+    startOfDayUTC.getTime() - IST_OFFSET + endHour * 60 * 60 * 1000
+  );
 
-  const endSlotTime = new Date(current);
-  endSlotTime.setHours(endHour, 0, 0, 0);
+  const intervalMilliseconds = intervalMinutes * 60 * 1000;
 
-  // 4. Loop to generate slots
-  while (startSlotTime < endSlotTime) {
-    slots.push(startSlotTime.toISOString());
-    startSlotTime.setMinutes(startSlotTime.getMinutes() + intervalMinutes);
+  // Loop to generate slots
+  let currentTime = startSlotTime;
+  while (currentTime.getTime() < endSlotTime.getTime()) {
+    slots.push(currentTime.toISOString());
+    currentTime = new Date(currentTime.getTime() + intervalMilliseconds);
   }
 
   return slots;
