@@ -36,7 +36,7 @@ const getSlots = async (req, res) => {
     );
 
     // Step 5: Send response
-    res.json({ localDateString, availableSlots });
+    res.json({ localDateString, availableSlots, bookedTimes });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
