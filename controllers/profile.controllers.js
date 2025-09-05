@@ -17,6 +17,9 @@ export const getProfile = async (req, res) => {
 export const createProfile = async (req, res) => {
   try {
     const { name, age } = req.body;
+    console.log("Incoming body:", req.body);
+    console.log("Decoded user from token:", req.user);
+
     // Validate inputs (explicit check so age = 0 works if allowed)
     if (!name || age === undefined || age === null) {
       return res.status(400).json({ message: "Please provide name and age" });
@@ -34,6 +37,7 @@ export const createProfile = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
+      user,
     });
   } catch (err) {
     console.error(err.message);
